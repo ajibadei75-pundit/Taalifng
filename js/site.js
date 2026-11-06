@@ -17,7 +17,7 @@ var P=[
 var L={free:'Free',paid:'Paid',spons:'Sponsored'},pl=document.getElementById('pl');
 function render(f){pl.innerHTML='';P.filter(function(p){return f==='all'||p.a===f||p.f===f}).forEach(function(p){
 var c=document.createElement('article');c.className='card prog';
-c.innerHTML='<div><span class="tag">'+(p.a==='edu'?'Educators':'Students')+'</span><span class="tag gold">'+L[p.f]+'</span></div><h3>'+p.t+'</h3><p>'+p.d+'</p><div class="meta">'+p.m+'</div><a class="btn" href="#contact">Register interest</a>';
+c.innerHTML='<div><span class="tag">'+(p.a==='edu'?'Educators':'Students')+'</span><span class="tag gold">'+L[p.f]+'</span></div><h3>'+p.t+'</h3><p>'+p.d+'</p><div class="meta">'+p.m+'</div><button class="btn" type="button" data-apply="'+p.t+'">Apply now</button>';
 pl.appendChild(c)})}
 render('all');
 document.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){document.querySelectorAll('.chip').forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');render(b.dataset.f)}});

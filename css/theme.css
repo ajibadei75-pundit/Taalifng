@@ -1,0 +1,114 @@
+/* Taalif NG | Theme layer: refined type, colour, buttons, sidebar list, dialogs and motion. Loads after styles.css. */
+:root{--head:#0f2b33;--gold2:#E8C879;--shadow:0 10px 30px rgba(16,45,53,.10)}
+:root[data-theme="dark"]{--head:#F5F3ED;--shadow:0 10px 30px rgba(0,0,0,.35)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--head:#F5F3ED;--shadow:0 10px 30px rgba(0,0,0,.35)}}
+body{font-family:Inter,system-ui,sans-serif;font-size:16.5px}
+h1,h2,h3,summary,.btn,.wm,.k b,.steps b,.mini,#sn button{font-family:'Plus Jakarta Sans',Manrope,Inter,sans-serif}
+h1,h2,h3{color:var(--head)}
+.hero h1,.partner h2,.partner h3{color:#F5F3ED}
+.sec .sub{font-size:17px}
+/* buttons */
+.btn{background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 6px 16px rgba(213,168,75,.32);transition:transform .2s,box-shadow .2s,filter .2s;font-weight:700;letter-spacing:.005em}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(213,168,75,.42)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;box-shadow:none;color:inherit}
+.btn.ghost:hover{background:rgba(213,168,75,.14)}
+.btn.sm{min-height:40px;padding:8px 16px;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.mini{transition:background .2s,border-color .2s}
+.mini:hover{background:rgba(40,124,112,.12)}
+.chip{transition:background .2s,color .2s,transform .15s}
+.chip:hover{transform:translateY(-1px)}
+/* cards */
+.card{box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s,border-color .25s}
+.sec .card:hover{transform:translateY(-3px);border-color:var(--em)}
+.hero{background-image:radial-gradient(circle at 85% 10%,rgba(40,124,112,.5),transparent 45%),radial-gradient(circle at 10% 90%,rgba(213,168,75,.14),transparent 40%)}
+/* hero entrance */
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.hero h1,.hero p.l,.hero .cta,.hero .reg,.hero .cbt{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.hero p.l{animation-delay:.12s}.hero .cta{animation-delay:.24s}.hero .reg{animation-delay:.34s}.hero .cbt{animation-delay:.3s}
+/* scroll reveal (only when JS enables it) */
+.js .rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.js .rv.in{opacity:1;transform:none}
+/* nav */
+nav a{padding:8px 9px;font-size:14px}
+@media(max-width:1080px){.mb{display:inline-flex}.hcta{display:none}.tg{margin-left:auto}nav{display:none;position:absolute;left:0;right:0;top:100%;margin:0;flex-direction:column;background:var(--hero);padding:8px 20px 18px;border-bottom:1px solid rgba(213,168,75,.35)}nav.open{display:flex}nav a{padding:13px 8px;font-size:16px;border-bottom:1px solid rgba(255,255,255,.08)}.navlog{display:block}}
+/* tools */
+.mcard{max-width:760px}
+.mbar{height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.mbar b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--em),var(--gold));border-radius:9px;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.opts{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 20px}
+.fit{font:800 22px 'Plus Jakarta Sans',sans-serif;color:var(--em);margin:4px 0 8px!important}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.split .stack{display:grid;gap:16px}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+#rs{max-width:280px;margin:0}
+.filters{align-items:center}
+.note-s{font-size:13.5px;color:var(--mute)}
+dialog{border:0;border-radius:18px;padding:0;width:min(560px,92vw);max-height:88dvh;background:var(--surface);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.4)}
+dialog[open]{animation:rise .3s ease both}
+dialog::backdrop{background:rgba(5,20,25,.6);backdrop-filter:blur(3px)}
+.dc{padding:clamp(20px,4vw,30px);position:relative}
+.dx{position:absolute;right:14px;top:14px}
+.dc h3{margin-bottom:14px;padding-right:70px}
+.rb{white-space:pre-wrap;font:400 15px/1.7 Inter,sans-serif;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 16px;overflow-wrap:anywhere}
+/* sidebar as list */
+#sn ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+#sn li button{position:relative;padding:12px 14px 12px 20px;font-size:15px;font-weight:600;margin:0}
+#sn li button::before{content:"";position:absolute;left:6px;top:50%;width:4px;height:0;background:var(--gold);border-radius:4px;transform:translateY(-50%);transition:height .2s}
+#sn li button[aria-current="page"]::before{height:20px}
+#su b{color:#F5F3ED}
+#sb{border-right:1px solid rgba(213,168,75,.2)}
+.pcon>*{animation:rise .35s ease both}
+@media(prefers-reduced-motion:reduce){.hero *,dialog[open],.pcon>*{animation:none!important}.js .rv{opacity:1;transform:none}}
+
+/* ===== Balance and button system (v2) ===== */
+/* Buttons: one scale. md 48 / sm 40 / xs 36. Variants: primary (gold), sec (emerald), ghost (outline), mini (compact), mini.g (positive), mini.d (danger) */
+.btn,.mini,.chip,.tg,.mb{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn{border-radius:12px;min-height:48px;padding:12px 26px;font-size:15px}
+.btn.sm{min-height:40px;padding:8px 18px;font-size:14px;border-radius:10px}
+.btn.sec{background:linear-gradient(135deg,#1f6b60,var(--em));color:#fff;box-shadow:0 6px 16px rgba(40,124,112,.3)}
+.btn.sec:hover{box-shadow:0 10px 22px rgba(40,124,112,.42)}
+.btn.ghost{border:1.5px solid currentColor}
+.mini{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:6px 14px;border-radius:9px;font-size:13px;text-decoration:none;margin:2px 6px 2px 0}
+.mini:hover{border-color:var(--em)}
+.mini.g{background:rgba(40,124,112,.1);border-color:var(--em);color:var(--em)}
+.mini.g:hover{background:rgba(40,124,112,.2)}
+.mini.d{border-color:#c4533f;color:#c4533f}
+.mini.d:hover{background:rgba(196,83,63,.12)}
+.chip{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 18px}
+.tg,.mb,.hcta{min-height:40px;height:40px}
+.hcta{padding:0 20px}
+.pt .mini{margin:0}
+td .mini{margin:2px 6px 2px 0}
+form .btn,.dc form .btn{width:100%;margin-top:4px}
+.acts{margin-top:auto;padding-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.acts .mini{margin:0}
+/* Forms */
+input,select,textarea{min-height:46px;border-radius:10px;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(40,124,112,.22)}
+input[type=checkbox]{min-height:0;width:auto}
+label{display:block}
+form{gap:14px}
+.acard form .btn{margin-top:6px}
+/* Cards: equal height, actions pinned to the bottom */
+.cards{gap:22px}
+.card{padding:26px}
+.cards .card,.stack .card{display:flex;flex-direction:column}
+.card>.btn{align-self:flex-start;margin-top:auto}
+.prog>.btn{align-self:stretch}
+.card .fit+.mbar+p{margin-top:14px}
+/* Section headers centred for balance over card grids */
+.sec>.wrap>h2,.sec>.wrap>.sub{text-align:center;margin-left:auto;margin-right:auto}
+.sec>.wrap>h2::before{margin-left:auto;margin-right:auto}
+.sec>.wrap>.sub{max-width:60ch}
+.sec>.wrap>.filters{justify-content:center}
+.mcard,#cp{max-width:760px;margin-left:auto;margin-right:auto}
+#mr>p{text-align:center}
+#cp label{max-width:420px}
+.opts{justify-content:flex-start}
+.steps li{text-align:left}
+/* Header balance: centre the nav between logo and actions on wide screens */
+@media(min-width:1081px){nav{margin-left:auto;margin-right:auto}}
+/* Small screens */
+@media(max-width:520px){.sec>.wrap>.sub{font-size:16px}.card{padding:20px}.acts .mini{flex:1}td .mini{min-height:40px}.hero{padding:44px 0 52px}.partner .btn,.cta .btn{width:100%}.filters .chip{flex:1 1 auto}#rs{max-width:none;width:100%}}

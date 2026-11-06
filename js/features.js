@@ -1,0 +1,62 @@
+/* Taalif NG | Features: local data store, applications, Course Match, Course Compass, counselling, resources, scroll reveal */
+window.TQ=(function(){var K='tq-data',d={};try{d=JSON.parse(localStorage.getItem(K))||{}}catch(e){}
+function w(){try{localStorage.setItem(K,JSON.stringify(d))}catch(e){}}
+return{load:function(k,f){return d[k]===undefined?f:d[k]},save:function(k,v){d[k]=v;w()},add:function(k,v){(d[k]=d[k]||[]).unshift(v);w()},ref:function(p){return p+'-'+new Date().getFullYear()+'-'+Math.floor(1000+Math.random()*9000)}}})();
+(function(){
+var $=function(i){return document.getElementById(i)},cfg=window.TAALIF||{},C=window.COURSES,RS=window.RES;
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function post(k,o){if(TQ.db&&TQ.db.on)TQ.db.submit(k,o);if(cfg.formEndpoint)fetch(cfg.formEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(Object.assign({kind:k},o))}).catch(function(){})}
+function nt(){return cfg.supabaseUrl?'We have received it and will be in touch.':cfg.formEndpoint?'We will contact you by email.':'Saved on this device. To receive submissions in your inbox, add a form endpoint in js/config.js.'}
+if(TQ.load('apps',null)===null&&!cfg.supabaseUrl)TQ.save('apps',[{r:'TNG-2026-0412',n:'Demo Learner',e:'learner@taalif.ng',p:'Classroom management',s:'Under review'},{r:'TNG-2026-0413',n:'Amina Yusuf',e:'amina@example.com',p:'AI in the classroom',s:'Submitted'},{r:'TNG-2026-0414',n:'Tunde Bello',e:'tunde@example.com',p:'JAMB UTME mock series',s:'Submitted'},{r:'TNG-2026-0415',n:'Grace Okoro',e:'grace@example.com',p:'Digital skills',s:'Waitlisted'}]);
+/* dialog */
+var dg=$('dlg');function openD(h){dg.innerHTML='<div class="dc"><button class="mini dx" type="button" data-x>Close</button>'+h+'</div>';dg.showModal()}
+dg.addEventListener('click',function(e){if(e.target===dg||e.target.closest('[data-x]'))dg.close()});
+/* applications */
+document.addEventListener('click',function(e){var a=e.target.closest('[data-apply]');if(a)apply(a.dataset.apply)});
+function apply(p){openD('<h3>Apply: '+esc(p)+'</h3><form id="af"><label>Full name<input name="n" required autocomplete="name"></label><label>Email<input name="e" type="email" required autocomplete="email"></label><label>Phone<input name="ph" type="tel" autocomplete="tel"></label><label>I am a<select name="w"><option>Teacher</option><option>Student</option><option>School representative</option></select></label><button class="btn" type="submit">Submit application</button></form>');
+$('af').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={r:TQ.ref('TNG'),n:f.get('n'),e:String(f.get('e')).toLowerCase(),ph:f.get('ph'),w:f.get('w'),p:p,s:'Submitted',t:new Date().toISOString()};TQ.add('apps',o);post('application',o);$('af').outerHTML='<p>Thank you, '+esc(o.n)+'. Your reference is <b>'+o.r+'</b>. Keep it to track your application.</p><p class="hint">'+nt()+'</p>'}}
+/* contact */
+$('cf').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={n:f.get('n'),e:f.get('e'),r:f.get('r'),m:f.get('m'),t:new Date().toISOString()};TQ.add('messages',o);post('message',o);$('toast').textContent='Message received. '+nt();ev.target.reset()};
+/* counselling */
+var cb=$('cb');cb.elements.d.min=new Date().toISOString().slice(0,10);
+cb.onsubmit=function(ev){ev.preventDefault();var f=new FormData(cb),o={r:TQ.ref('CNS'),n:f.get('n'),e:String(f.get('e')).toLowerCase(),ph:f.get('ph'),ty:f.get('ty'),md:f.get('md'),d:f.get('d'),m:f.get('m'),s:'Requested',t:new Date().toISOString()};TQ.add('bookings',o);post('counselling',o);$('cbm').textContent='Request received. Your reference is '+o.r+'. '+nt();cb.reset()};
+/* Course Match */
+var Q=[{q:'What do you enjoy doing? Pick up to 3.',m:3,o:[['Solving maths and logic problems','math,tech'],['Helping people feel better','health,people'],['Building or fixing things','build,math'],['Debating and writing','write,lead'],['Drawing, designing, creating','creative,build'],['Running a small business','business,lead'],['Working with plants and animals','nature,sci'],['Teaching or guiding others','people,lead']]},
+{q:'Which subjects are your strongest? Pick up to 3.',m:3,o:[['Mathematics','math'],['Biology or Chemistry','sci'],['English or Literature','write'],['Government or History','lead,write'],['Economics or Commerce','business'],['Physics','math,build'],['CRS, IRS or Arabic','faith,people']]},
+{q:'Where would you like to work?',m:1,o:[['Hospital or laboratory','health,sci'],['Office or bank','business'],['Outdoors or on site','nature,build'],['School or community','people,faith'],['Studio or tech lab','creative,tech']]},
+{q:'What matters most in your future career?',m:1,o:[['Earning well','business,tech'],['Serving my community','people,health,faith'],['Leading and influencing','lead'],['Creating and inventing','creative,tech,build'],['Discovering new knowledge','sci,math']]}];
+var qi=0,sel=[],ans=[],mq=$('mq');
+function showQ(){var q=Q[qi];mq.innerHTML='<p class="hint">Question '+(qi+1)+' of '+Q.length+'</p><div class="mbar"><b style="width:'+(qi/Q.length*100)+'%"></b></div><h3 style="margin-top:14px">'+q.q+'</h3><div class="opts">'+q.o.map(function(o,i){return '<button type="button" class="chip" data-i="'+i+'" aria-pressed="'+(sel.indexOf(i)>-1)+'">'+o[0]+'</button>'}).join('')+'</div><button class="btn" id="mnx" type="button"'+(sel.length?'':' disabled')+'>'+(qi<Q.length-1?'Next question':'See my matches')+'</button>'}
+mq.onclick=function(e){var c=e.target.closest('[data-i]'),q=Q[qi];if(c){var i=+c.dataset.i,p=sel.indexOf(i);if(p>-1)sel.splice(p,1);else if(q.m===1)sel=[i];else if(sel.length<q.m)sel.push(i);showQ();return}
+if(e.target.id==='mnx'&&sel.length){ans[qi]=sel;sel=[];qi++;qi<Q.length?showQ():result()}
+if(e.target.id==='rt'){qi=0;sel=[];ans=[];$('mr').innerHTML='';showQ()}};
+function result(){var w={};ans.forEach(function(a,k){a.forEach(function(i){Q[k].o[i][1].split(',').forEach(function(t){w[t]=(w[t]||0)+(Q[k].m===1?2:1)})})});
+var sc=C.map(function(c){return{c:c,s:c.tags.reduce(function(a,t){return a+(w[t]||0)},0)}}).sort(function(a,b){return b.s-a.s}),mx=sc[0].s||1,top=sc.slice(0,3).map(function(x){return{id:x.c.id,n:x.c.n,p:Math.round(60+38*x.s/mx)}});
+TQ.save('match',{t:new Date().toISOString(),top:top});
+mq.innerHTML='<h3>Your top matches</h3><p class="hint">A guide for conversation, not a prediction. Talk it through with a counsellor.</p><button class="btn ghost" id="rt" type="button">Retake</button>';
+$('mr').innerHTML='<div class="cards" style="margin-top:20px">'+top.map(function(t){var c=C.filter(function(x){return x.id===t.id})[0];return '<article class="card"><h3>'+c.n+'</h3><p class="fit">Fit '+t.p+'%</p><div class="mbar"><b data-w="'+t.p+'"></b></div><p style="margin-top:12px">Careers: '+c.careers.join(', ')+'.</p><p>Core JAMB subjects: '+c.req.join(', ')+'.</p><button class="btn sm" type="button" data-c="'+c.id+'">Open in Course Compass</button></article>'}).join('')+'</div><p style="margin-top:18px"><a class="btn" href="#counselling">Talk to a counsellor</a></p>';
+setTimeout(function(){document.querySelectorAll('#mr [data-w]').forEach(function(b){b.style.width=b.dataset.w+'%'})},60);$('mr').scrollIntoView({behavior:'smooth',block:'nearest'})}
+showQ();
+/* Course Compass */
+var cm=0,sub=[],cp=$('cp');
+function det(id){var c=C.filter(function(x){return x.id===id})[0];return '<div class="card" style="margin-top:18px"><h3>'+c.n+'</h3><p><b>JAMB UTME core subjects:</b> '+c.req.join(', ')+', plus usually one more subject that varies by university.</p><p><b>O-level:</b> Most universities ask for at least five credits including English and Mathematics. Check each school.</p><p><b>Typical duration:</b> about '+c.yrs+' years.</p><p><b>Careers:</b> '+c.careers.join(', ')+'.</p><p class="hint">Combinations and cut-off marks change. Confirm in the current JAMB brochure and with your chosen university.</p></div>'}
+function paintC(id){var h;if(cm===0){h='<label>Choose a course<select id="cs">'+C.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>'}).join('')+'</select></label><div id="cd"></div>';cp.innerHTML=h;var s=$('cs');s.value=id||C[0].id;s.onchange=function(){$('cd').innerHTML=det(s.value)};$('cd').innerHTML=det(s.value)}
+else{cp.innerHTML='<p class="hint">Select the subjects you take or plan to take.</p><div class="opts">'+window.SUBJ.map(function(s){return '<button type="button" class="chip" data-s="'+s+'" aria-pressed="'+(sub.indexOf(s)>-1)+'">'+s+'</button>'}).join('')+'</div><div id="cf2"></div>';var f=C.filter(function(c){return c.req.every(function(r){return sub.indexOf(r)>-1})});$('cf2').innerHTML=sub.length<3?'<p class="hint">Choose at least three subjects.</p>':(f.length?'<p><b>'+f.length+' course'+(f.length>1?'s':'')+' you can aim for:</b></p><div class="opts">'+f.map(function(c){return '<button type="button" class="chip" data-c="'+c.id+'" aria-pressed="false">'+c.n+'</button>'}).join('')+'</div>':'<p>No course matches these subjects yet. Try adding English or Mathematics.</p>')}}
+$('compass').addEventListener('click',function(e){var m=e.target.closest('[data-m]'),s=e.target.closest('[data-s]');if(m){cm=+m.dataset.m;document.querySelectorAll('[data-m]').forEach(function(b){b.setAttribute('aria-pressed',b===m)});paintC()}else if(s){var i=sub.indexOf(s.dataset.s);i>-1?sub.splice(i,1):sub.push(s.dataset.s);paintC()}});
+document.addEventListener('click',function(e){var c=e.target.closest('[data-c]');if(!c)return;cm=0;document.querySelectorAll('[data-m]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m==='0')});paintC(c.dataset.c);$('compass').scrollIntoView({behavior:'smooth'})});
+paintC();
+/* Resources */
+var rf='All',rq='',rl=$('rl2');
+function paintR(){var sv=TQ.load('saved',[]),ty=['All'].concat(RS.map(function(r){return r.t}).filter(function(t,i,a){return a.indexOf(t)===i}));$('rt2').innerHTML=ty.map(function(t){return '<button type="button" class="chip" data-t="'+t+'" aria-pressed="'+(t===rf)+'">'+t+'</button>'}).join('');
+var l=RS.filter(function(r){return(rf==='All'||r.t===rf)&&(r.n+' '+r.d).toLowerCase().indexOf(rq)>-1});rl.innerHTML=l.length?l.map(function(r){return '<article class="card"><span class="tag">'+r.t+'</span><h3 style="margin-top:10px">'+r.n+'</h3><p>'+r.d+'</p><div class="acts"><button class="mini g" type="button" data-o="'+r.id+'">Open</button><button class="mini" type="button" data-sv="'+r.id+'">'+(sv.indexOf(r.id)>-1?'Saved':'Save')+'</button></div></article>'}).join(''):'<p>No resources match your search. Try another word or clear the filter.</p>'}
+$('rs').oninput=function(){rq=this.value.toLowerCase();paintR()};
+$('resources').addEventListener('click',function(e){var t=e.target.closest('[data-t]'),v=e.target.closest('[data-sv]');if(t){rf=t.dataset.t;paintR()}if(v){tog(v.dataset.sv);paintR()}});
+function tog(id){var s=TQ.load('saved',[]),i=s.indexOf(id);i>-1?s.splice(i,1):s.push(id);TQ.save('saved',s)}
+TQ.openRes=function(id){var r=RS.filter(function(x){return x.id===id})[0];openD('<span class="tag">'+r.t+'</span><h3 style="margin:10px 0">'+r.n+'</h3><pre class="rb">'+esc(r.body)+'</pre><p><button class="btn sm" type="button" id="dl">Download</button> <button class="mini" type="button" id="sv2">Save</button></p>');
+$('dl').onclick=function(){var u=URL.createObjectURL(new Blob([r.n+'\n\n'+r.body+'\n\nTaalif NG | RC 9893040'],{type:'text/plain'})),a=document.createElement('a');a.href=u;a.download=r.id+'.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},1000)};
+$('sv2').onclick=function(){tog(id);this.textContent='Done';paintR()}};
+document.addEventListener('click',function(e){var o=e.target.closest('#resources [data-o]');if(o)TQ.openRes(o.dataset.o)});
+paintR();
+/* scroll reveal */
+if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion:reduce)').matches){document.documentElement.classList.add('js');var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.12});document.querySelectorAll('.sec h2,.sec .sub,.sec .card,.steps li,.partner,.trust li').forEach(function(el){el.classList.add('rv');io.observe(el)})}
+})();
