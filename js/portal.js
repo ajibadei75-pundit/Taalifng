@@ -1,8 +1,8 @@
 /* Taalif NG | Portal: role-based demo login, dashboards, offline notice, install prompt. Demo auth only: replace with Supabase Auth + RLS. */
 (function(){
 var $=function(i){return document.getElementById(i)};
-var R={learner:{n:'Learner',e:'learner@taalif.ng',v:['dash','apps','match','counsel','saved','cbt','certs']},tutor:{n:'Tutor',e:'tutor@taalif.ng',v:['dash','cohorts','attend']},counsellor:{n:'Counsellor',e:'counsellor@taalif.ng',v:['dash','book']},institution:{n:'Institution',e:'school@taalif.ng',v:['dash','staff','reports']},sponsor:{n:'Sponsor',e:'sponsor@taalif.ng',v:['dash','funds','impact']},admin:{n:'Administrator',e:'admin@taalif.ng',v:['dash','apps','book','msgs','progs','users','audit']}};
-var L={dash:'Overview',apps:'Applications',match:'Course Match',counsel:'My counselling',saved:'Saved resources',cbt:'CBT practice',certs:'Certificates',cohorts:'My cohorts',attend:'Attendance',book:'Counselling requests',msgs:'Messages',staff:'Staff',reports:'Reports',funds:'Contributions',impact:'Impact reports',progs:'Programmes',users:'Users and roles',audit:'Audit log'};
+var R={learner:{n:'Learner',e:'learner@taalif.ng',v:['dash','apps','match','counsel','saved','cbt','certs']},tutor:{n:'Tutor',e:'tutor@taalif.ng',v:['dash','cohorts','attend']},counsellor:{n:'Counsellor',e:'counsellor@taalif.ng',v:['dash','book']},institution:{n:'Institution',e:'school@taalif.ng',v:['dash','staff','reports']},sponsor:{n:'Sponsor',e:'sponsor@taalif.ng',v:['dash','funds','impact']},admin:{n:'Administrator',e:'admin@taalif.ng',v:['dash','apps','events','book','msgs','users','audit']}};
+var L={events:'Programmes and events',dash:'Overview',apps:'Applications',match:'Course Match',counsel:'My counselling',saved:'Saved resources',cbt:'CBT practice',certs:'Certificates',cohorts:'My cohorts',attend:'Attendance',book:'Counselling requests',msgs:'Messages',staff:'Staff',reports:'Reports',funds:'Contributions',impact:'Impact reports',progs:'Programmes',users:'Users and roles',audit:'Audit log'};
 var S=null,sel='learner',cv='dash';
 try{S=JSON.parse(sessionStorage.getItem('tq'))}catch(e){}
 var A=[],AU=TQ.load('audit',[]);
@@ -12,6 +12,7 @@ function K(a){return '<div class="kp">'+a.map(function(x){return '<div class="k"
 function P(s){return '<span class="pill '+(s==='Approved'?'ok':s==='Rejected'?'no':'')+'">'+s+'</span>'}
 function C(t,b){return '<div class="card" style="margin-bottom:16px"><h3>'+t+'</h3><p>'+b+'</p></div>'}
 var V={
+events:function(){return window.EVV?EVV.list():''},
 match:function(){var m=TQ.load('match',null);return (m?C('Your latest Course Match','Top matches: '+m.top.map(function(t){return E(t.n)+' ('+t.p+'%)'}).join(', ')+'.'):C('No result yet','Take Course Match to see which courses fit your interests and subjects.'))+'<a class="btn" href="#match">'+(m?'Retake Course Match':'Take Course Match')+'</a>'},
 counsel:function(){var b=TQ.load('bookings',[]).filter(function(x){return x.e===S.email});return (b.length?T(['Reference','Type','Date','Mode','Status'],b.map(function(x){return [E(x.r),E(x.ty),E(x.d),E(x.md),P(x.s)]})):C('No sessions yet','Book a private session with a counsellor.'))+'<a class="btn" href="#counselling">Book a session</a>'},
 saved:function(){var s=TQ.load('saved',[]),l=RES.filter(function(r){return s.indexOf(r.id)>-1});return l.length?T(['Resource','Type','Action'],l.map(function(r){return [E(r.n),r.t,'<button class="mini g" data-o="'+r.id+'">Open</button>']})):C('Nothing saved yet','Save resources from the library to find them here.')+'<a class="btn" href="#resources">Browse resources</a>'},
@@ -32,7 +33,9 @@ users:function(){return T(['Name','Email','Role','Status'],[['Demo Learner','lea
 audit:function(){return AU.length?T(['Time','Actor','Action'],AU):C('No actions yet','Approve or reject an application and it will be recorded here.')}};
 function render(){A=TQ.load('apps',[]);var r=R[S.role];$('pttl').textContent=L[cv];$('sn').innerHTML='<ul>'+r.v.map(function(v){return '<li><button type="button" data-v="'+v+'"'+(v===cv?' aria-current="page"':'')+'>'+L[v]+'</button></li>'}).join('')+'</ul>';$('su').innerHTML='<b>'+r.n+'</b><br>'+E(S.email);$('pc').innerHTML=r.v.indexOf(cv)<0?C('Access denied','Your role cannot open this page.'):V[cv]()}
 function side(o){$('sb').classList.toggle('open',o);$('ov').hidden=!o}
-function route(){var h=location.hash.slice(1);if(h==='portal'&&!S){location.hash='login';return}if(h==='login'&&S){location.hash='portal';return}var p=h==='portal',a=h==='login';$('site').hidden=p||a;$('auth').hidden=!a;$('portal').hidden=!p;document.body.classList.toggle('inportal',p);if(p){side(false);scrollTo(0,0);(TQ.db.on?TQ.db.pull(S.role):Promise.resolve()).then(render)}else if(a){scrollTo(0,0)}else{var el=h&&$(h);if(el)el.scrollIntoView()}}
+function refresh(){return (TQ.db.on?TQ.db.pull(S.role):Promise.resolve()).then(function(){return S.role==='admin'&&window.EVV?EVV.load():0}).then(render)}
+TQ.rerender=function(){if(S)refresh()};
+function route(){var h=location.hash.slice(1);if(h==='portal'&&!S){location.hash='login';return}if(h==='login'&&S){location.hash='portal';return}var p=h==='portal',a=h==='login';$('site').hidden=p||a;$('auth').hidden=!a;$('portal').hidden=!p;document.body.classList.toggle('inportal',p);if(p){side(false);scrollTo(0,0);refresh()}else if(a){scrollTo(0,0)}else{var el=h&&$(h);if(el)el.scrollIntoView();if(h.indexOf('event-')===0&&window.EVV)EVV.openBySlug(h.slice(6))}}
 function roles(){$('rl').innerHTML=Object.keys(R).map(function(k){return '<button type="button" class="chip" data-r="'+k+'" aria-pressed="'+(k===sel)+'">'+R[k].n+'</button>'}).join('');$('em').value=R[sel].e}
 $('rl').onclick=function(e){var b=e.target.closest('[data-r]');if(b){sel=b.dataset.r;roles()}};
 var reg=false;

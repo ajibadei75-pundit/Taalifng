@@ -24,7 +24,7 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg" viewBox="0 0 40 40"><rect x=".75" y=".75" width="38.5" height="38.5" rx="11" fill="#102D35" stroke="#D5A84B" stroke-width="1.5"/><path d="M8 16c4-2.4 8-2.2 12 .8 4-3 8-3.2 12-.8v12.5c-4-2.4-8-2.2-12 .8-4-3-8-3.2-12-.8z" fill="none" stroke="#F5F3ED" stroke-width="2.2" stroke-linejoin="round"/><path d="M20 16.8v12.5" stroke="#F5F3ED" stroke-width="2.2"/><circle cx="20" cy="9.5" r="3.4" fill="#D5A84B"/></symbol></svg>
 <header><div class="wrap nav">
 <a class="logo" href="#top" aria-label="Taalif NG home"><svg class="lm" aria-hidden="true"><use href="#lg"/></svg><span class="wm">Taalif <b>NG</b></span></a>
-<nav id="mn" aria-label="Main"><a href="#programmes">Programmes</a><a href="#match">Course Match</a><a href="#compass">Compass</a><a href="#counselling">Counselling</a><a href="#resources">Resources</a><a href="#partners">Partnerships</a><a href="#faq">FAQs</a><a href="#contact">Contact</a><a href="#login" class="navlog">Log in</a></nav>
+<nav id="mn" aria-label="Main"><a href="#programmes">Programmes</a><a href="#match">Course Match</a><a href="#compass">Compass</a><a href="#counselling">Counselling</a><a href="#resources">Resources</a><a href="#partners">Partners</a><a href="#contact">Contact</a><a href="#faq" class="navlog">FAQs</a><a href="#login" class="navlog">Log in</a></nav>
 <button class="tg" id="tg" type="button" aria-label="Switch to night mode"><span id="ti" aria-hidden="true">☾</span><span id="tt">Night</span></button>
 <a class="btn hcta" href="#login">Log in</a>
 <button class="mb" id="mb" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mn"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
@@ -49,6 +49,8 @@
 
 <div class="trust"><div class="wrap"><ul><li>Free, paid and sponsored places</li><li>Payments in naira (NGN)</li><li>Verifiable certificates</li><li>Starting in Oyo State</li></ul></div></div>
 
+<section class="show" id="showcase" aria-roledescription="carousel" aria-label="Highlights"><div class="wrap sl"><div class="sl-t"><div id="slt" aria-live="polite"></div><div class="sl-c"><button class="mini" id="slp" type="button" aria-label="Previous slide">&larr;</button><span id="sld" class="dots"></span><button class="mini" id="sln" type="button" aria-label="Next slide">&rarr;</button></div></div><div class="sl-i"><img id="si1" alt="" width="400" height="300"><img id="si2" alt="" width="400" height="300"></div></div></section>
+
 <section class="sec" id="audiences"><div class="wrap">
 <h2>One platform, two kinds of learner</h2>
 <p class="sub">Educators and students get equal attention here. Each has a path built around what they need to do next.</p>
@@ -69,8 +71,8 @@
 <button class="chip" data-f="spons" aria-pressed="false">Sponsored</button>
 <button class="chip" data-f="paid" aria-pressed="false">Paid</button>
 </div>
-<div class="cards" id="pl"></div>
-<p class="sub" style="margin:20px 0 0;font-size:14px">Sample listings. Dates, fees and eligibility are confirmed on each programme page when applications open.</p>
+<div class="cards" id="pl"></div><p class="sub" id="pln" style="margin:20px 0 0;font-size:14px">Sample listings. Real programmes appear here once an administrator publishes them.</p>
+
 </div></section>
 
 <section class="sec" id="match"><div class="wrap"><h2>Course Match</h2><p class="sub">Answer four quick questions and see which university courses fit your interests, strengths and goals.</p><div class="mcard card" id="mq"></div><div id="mr"></div></div></section>
@@ -156,6 +158,8 @@
 <script src="js/site.js" defer></script>
 <script src="js/features.js" defer></script>
 <script src="js/supabase-client.js" defer></script>
+<script src="js/events.js" defer></script>
+<script src="js/ui.js" defer></script>
 <script src="js/portal.js" defer></script>
 <script src="js/pwa.js" defer></script>
 </body>

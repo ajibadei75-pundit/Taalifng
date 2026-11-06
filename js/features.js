@@ -9,8 +9,8 @@ function post(k,o){if(TQ.db&&TQ.db.on)TQ.db.submit(k,o);if(cfg.formEndpoint)fetc
 function nt(){return cfg.supabaseUrl?'We have received it and will be in touch.':cfg.formEndpoint?'We will contact you by email.':'Saved on this device. To receive submissions in your inbox, add a form endpoint in js/config.js.'}
 if(TQ.load('apps',null)===null&&!cfg.supabaseUrl)TQ.save('apps',[{r:'TNG-2026-0412',n:'Demo Learner',e:'learner@taalif.ng',p:'Classroom management',s:'Under review'},{r:'TNG-2026-0413',n:'Amina Yusuf',e:'amina@example.com',p:'AI in the classroom',s:'Submitted'},{r:'TNG-2026-0414',n:'Tunde Bello',e:'tunde@example.com',p:'JAMB UTME mock series',s:'Submitted'},{r:'TNG-2026-0415',n:'Grace Okoro',e:'grace@example.com',p:'Digital skills',s:'Waitlisted'}]);
 /* dialog */
-var dg=$('dlg');function openD(h){dg.innerHTML='<div class="dc"><button class="mini dx" type="button" data-x>Close</button>'+h+'</div>';dg.showModal()}
-dg.addEventListener('click',function(e){if(e.target===dg||e.target.closest('[data-x]'))dg.close()});
+var dg=$('dlg');function openD(h,w){dg.classList.toggle('wide',!!w);dg.innerHTML='<div class="dc"><button class="mini dx" type="button" data-x>Close</button>'+h+'</div>';dg.showModal()}
+dg.addEventListener('click',function(e){if(e.target===dg||e.target.closest('[data-x]'))dg.close()});TQ.openD=openD;dg.addEventListener('close',function(){dg.classList.remove('wide');if(location.hash.indexOf('#event-')===0)history.replaceState(null,'',location.pathname+location.search)});
 /* applications */
 document.addEventListener('click',function(e){var a=e.target.closest('[data-apply]');if(a)apply(a.dataset.apply)});
 function apply(p){openD('<h3>Apply: '+esc(p)+'</h3><form id="af"><label>Full name<input name="n" required autocomplete="name"></label><label>Email<input name="e" type="email" required autocomplete="email"></label><label>Phone<input name="ph" type="tel" autocomplete="tel"></label><label>I am a<select name="w"><option>Teacher</option><option>Student</option><option>School representative</option></select></label><button class="btn" type="submit">Submit application</button></form>');

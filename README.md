@@ -38,3 +38,6 @@ When both settings are filled in, the demo logins are switched off, applications
 
 ### Status of the live project
 The Taalif NG project (gtggukglyxhrrjlduduk, eu-west-2) already has the schema applied and its URL and anon key are in `js/config.js`. Remaining steps: set the Site URL under Authentication > URL Configuration, redeploy, create your account, and make yourself administrator.
+
+## Programmes and events (admin)
+Sign in as administrator, open "Programmes and events", and choose Create programme. Set the title, date, venue or link, fee (0 = free, or tick Sponsored), number of seats, payment details and extra registration questions. Each programme gets a registration link (use Copy link) such as `https://your-site/#event-your-programme-123`. Every reservation reduces the seats left; when the last seat is taken the programme leaves the public list and its link says it is fully booked. Removing a registration frees the seat. Registrants can be marked paid and exported as CSV. Paid programmes show your payment details after registering; online card payment (Paystack) needs a server function and is not included yet.

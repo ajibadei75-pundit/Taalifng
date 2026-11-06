@@ -1,5 +1,5 @@
 /* Taalif NG service worker. Bump VERSION on each release to refresh caches. */
-const VERSION='taalif-v4',PRE=['./','index.html','offline.html','css/styles.css','css/theme.css','js/config.js','js/data.js','js/features.js','js/supabase-client.js','js/site.js','js/portal.js','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/favicon.svg'];
+const VERSION='taalif-v5',PRE=['./','index.html','offline.html','css/styles.css','css/theme.css','js/config.js','js/data.js','js/features.js','js/events.js','js/ui.js','images/s1.svg','images/s2.svg','images/s3.svg','images/s4.svg','js/supabase-client.js','js/site.js','js/portal.js','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/favicon.svg'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(PRE)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==VERSION).map(x=>caches.delete(x)))));self.clients.claim()});
 self.addEventListener('fetch',e=>{const r=e.request,u=new URL(r.url);

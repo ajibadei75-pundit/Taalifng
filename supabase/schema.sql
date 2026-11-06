@@ -97,3 +97,77 @@ grant usage on all sequences in schema public to anon, authenticated;
 
 -- After you create your own account on the site, make yourself the first administrator:
 -- insert into public.user_roles(user_id, role) select id, 'admin' from auth.users where email = 'YOUR_EMAIL_HERE';
+
+-- ===== Programmes and events (admin-created, with seat counting) =====
+create table public.events(
+  id bigint generated always as identity primary key,
+  slug text not null unique,
+  title text not null check (char_length(title) between 3 and 160),
+  description text check (char_length(description) <= 3000),
+  audience text not null default 'Both' check (audience in ('Educators','Students','Both')),
+  mode text not null default 'In person' check (mode in ('In person','Online','Hybrid')),
+  location text, starts_at timestamptz,
+  fee_ngn numeric(12,2) not null default 0 check (fee_ngn >= 0),
+  sponsored boolean not null default false,
+  capacity integer not null check (capacity > 0),
+  registered integer not null default 0 check (registered >= 0),
+  status text not null default 'open' check (status in ('draft','open','full','closed')),
+  image_url text, payment_info text,
+  fields jsonb not null default '[]'::jsonb,
+  created_by uuid default auth.uid() references auth.users on delete set null,
+  created_at timestamptz not null default now(),
+  check (registered <= capacity));
+
+create table public.registrations(
+  id bigint generated always as identity primary key,
+  event_id bigint not null references public.events on delete cascade,
+  ref text not null unique,
+  name text not null check (char_length(name) between 1 and 120),
+  email text not null check (char_length(email) between 3 and 200),
+  phone text check (char_length(phone) <= 40),
+  answers jsonb not null default '{}'::jsonb,
+  payment_status text not null default 'pending' check (payment_status in ('free','pending','paid')),
+  created_at timestamptz not null default now());
+create unique index registrations_event_email on public.registrations(event_id, lower(email));
+create index registrations_event on public.registrations(event_id);
+
+alter table public.events enable row level security;
+alter table public.registrations enable row level security;
+
+create policy events_public_read on public.events for select to anon, authenticated using (status in ('open','full'));
+create policy events_admin_all on public.events for all to authenticated using (private.has_role('admin')) with check (private.has_role('admin'));
+create policy reg_insert on public.registrations for insert to anon, authenticated
+  with check (exists (select 1 from public.events e where e.id = event_id and e.status = 'open'));
+create policy reg_admin_all on public.registrations for all to authenticated using (private.has_role('admin')) with check (private.has_role('admin'));
+create policy reg_own_read on public.registrations for select to authenticated using (lower(email) = lower(auth.jwt() ->> 'email'));
+
+create or replace function public.registrations_guard() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare e public.events%rowtype;
+begin
+  select * into e from public.events where id = new.event_id for update;
+  if not found or e.status <> 'open' or e.registered >= e.capacity then
+    raise exception 'This programme is fully booked or closed';
+  end if;
+  update public.events set registered = registered + 1,
+    status = case when registered + 1 >= capacity then 'full' else status end
+  where id = new.event_id;
+  return new;
+end $$;
+create or replace function public.registrations_release() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  update public.events set registered = greatest(registered - 1, 0),
+    status = case when status = 'full' then 'open' else status end
+  where id = old.event_id;
+  return old;
+end $$;
+revoke execute on function public.registrations_guard() from public, anon, authenticated;
+revoke execute on function public.registrations_release() from public, anon, authenticated;
+create trigger trg_reg_guard before insert on public.registrations for each row execute function public.registrations_guard();
+create trigger trg_reg_release after delete on public.registrations for each row execute function public.registrations_release();
+
+grant select on public.events to anon;
+grant insert on public.registrations to anon;
+grant select, insert, update, delete on public.events, public.registrations to authenticated;
+grant usage on all sequences in schema public to anon, authenticated;

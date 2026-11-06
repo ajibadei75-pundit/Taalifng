@@ -6,7 +6,7 @@ var T={application:'applications',counselling:'bookings',message:'messages'};
 var M={applications:function(o,u){return{ref:o.r,user_id:u,name:o.n,email:o.e,phone:o.ph||null,applicant_type:o.w,programme:o.p,status:'Submitted'}},
 bookings:function(o,u){return{ref:o.r,user_id:u,name:o.n,email:o.e,phone:o.ph||null,type:o.ty,mode:o.md,preferred_date:o.d||null,message:o.m||null,status:'Requested'}},
 messages:function(o){return{name:o.n,email:o.e,role:o.r,message:o.m}}};
-TQ.db={on:on,
+TQ.db={on:on,cl:cl,
 submit:function(kind,o){var t=T[kind];if(!on||!t||!cl)return;cl.auth.getSession().then(function(s){var u=s.data&&s.data.session?s.data.session.user.id:null;return cl.from(t).insert(M[t](o,u))}).catch(function(){})},
 signIn:function(e,p){return need()||cl.auth.signInWithPassword({email:e,password:p})},
 signUp:function(e,p,n){return need()||cl.auth.signUp({email:e,password:p,options:{data:{full_name:n}}})},
